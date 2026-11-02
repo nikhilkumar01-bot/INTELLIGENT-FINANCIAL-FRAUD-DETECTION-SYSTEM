@@ -4,68 +4,110 @@
  * All /api/* requests are handled here.
  */
 
-// Load env from backend/.env if present
-require('dotenv').config({ path: require('path').join(__dirname, '..', 'backend', '.env') });
+const path = require('path');
+
+// Ensure both root and backend/node_modules are resolved in all environments
+const backendNodeModules = path.join(__dirname, '..', 'backend', 'node_modules');
+if (!module.paths.includes(backendNodeModules)) {
+  module.paths.unshift(backendNodeModules);
+}
+
+// Load env from backend/.env if present (fallback for local emulation)
+try {
+  require('dotenv').config({ path: path.join(__dirname, '..', 'backend', '.env') });
+} catch (e) {
+  // Ignore missing local env file on Vercel
+}
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-const { connectDB } = require('../backend/src/config/db');
+const { connectDB, getDBStatus } = require('../backend/src/config/db');
 const apiRoutes = require('../backend/src/routes/api');
 const errorHandler = require('../backend/src/middleware/errorHandler');
 
 const app = express();
 
-// Security
+// Security Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: false,
 }));
 
-// CORS — allow all origins in serverless (Vercel handles domain security)
+// CORS Configuration — allow requests from all origins
 app.use(cors({ origin: true, credentials: true }));
 
-// Parsers
+// Request Parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting
+// URL Normalization Middleware for Vercel Rewrites
+app.use((req, res, next) => {
+  const matched = req.headers['x-matched-path'] || req.headers['x-vercel-matched-path'];
+  if (matched && matched.startsWith('/api') && (req.url === '/api/index.js' || req.url === '/api' || req.url === '/api/')) {
+    req.url = matched;
+  }
+  next();
+});
+
+// Database Connection Middleware for Serverless Lifecycle
+let dbPromise = null;
+app.use(async (req, res, next) => {
+  try {
+    if (!dbPromise) {
+      dbPromise = connectDB();
+    }
+    await dbPromise;
+    next();
+  } catch (err) {
+    console.error('[Database Middleware Error]', err.message);
+    // Continue: repoService seamlessly uses embedded store if MongoDB fails
+    next();
+  }
+});
+
+// Rate limiting for auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { success: false, message: 'Too many requests, please try again later.' },
+  message: { success: false, message: 'Too many authentication requests, please try again in a few minutes.' }
 });
+
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/auth/login', authLimiter);
+app.use('/auth/register', authLimiter);
 
-// API Routes — mounted at root because Vercel rewrites /api/* → this file
-app.use('/api', apiRoutes);
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
+// Health check endpoints
+app.get(['/health', '/api/health'], (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  return res.json({
     status: 'healthy',
     system: 'Intelligent Financial Fraud Detection API',
     environment: 'vercel-serverless',
+    database: getDBStatus(),
     timestamp: new Date().toISOString(),
   });
 });
 
-// Error handler
+// Mount API routes at both /api and / to guarantee route matching regardless of rewrite format
+app.use('/api', apiRoutes);
+app.use('/', apiRoutes);
+
+// Fallback 404 handler for API — ALWAYS returns JSON
+app.use((req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  return res.status(404).json({
+    success: false,
+    message: `API endpoint not found: ${req.method} ${req.originalUrl || req.url}`
+  });
+});
+
+// Centralized Error Handler — ALWAYS returns JSON
 app.use(errorHandler);
 
-// Connect DB then export (Vercel calls handler on each request)
-let dbConnected = false;
-const handler = async (req, res) => {
-  if (!dbConnected) {
-    await connectDB();
-    dbConnected = true;
-  }
-  return app(req, res);
-};
-
-module.exports = handler;
+module.exports = app;

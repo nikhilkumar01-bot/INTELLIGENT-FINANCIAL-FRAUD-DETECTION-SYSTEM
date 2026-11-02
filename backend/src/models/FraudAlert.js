@@ -31,4 +31,4 @@ const FraudAlertSchema = new mongoose.Schema({
   resolvedAt: { type: Date }
 }, { timestamps: true });
 
-module.exports = mongoose.model('FraudAlert', FraudAlertSchema);
+module.exports = mongoose.models.FraudAlert || mongoose.model('FraudAlert', FraudAlertSchema);

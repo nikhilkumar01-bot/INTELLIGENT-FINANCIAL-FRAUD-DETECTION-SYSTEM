@@ -1,4 +1,11 @@
-const API_BASE = '/api';
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (!envUrl) return '/api';
+  const clean = envUrl.replace(/\/+$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
+const API_BASE = getApiBase();
 
 const getHeaders = () => {
   const token = localStorage.getItem('fraudshield_token');
@@ -13,20 +20,35 @@ const handleResponse = async (res) => {
   if (res.status === 401) {
     localStorage.removeItem('fraudshield_token');
     localStorage.removeItem('fraudshield_user');
-    if (!window.location.pathname.includes('/login')) {
+    if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
       window.location.href = '/login';
     }
   }
 
-  const contentType = res.headers.get('content-type');
-  if (contentType && contentType.includes('text/csv')) {
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('text/csv')) {
     return await res.blob();
   }
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.message || 'API request failed.');
+  // Safely read response text first without blindly calling res.json()
+  const rawText = await res.text();
+  let data;
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch {
+    // Non-JSON response (e.g. server error, gateway timeout, HTML error page)
+    const preview = rawText ? rawText.trim().slice(0, 150) : '';
+    throw new Error(
+      !res.ok
+        ? `Server error (${res.status}): ${preview || res.statusText || 'Unexpected non-JSON response'}`
+        : 'Invalid JSON response received from server.'
+    );
   }
+
+  if (!res.ok) {
+    throw new Error(data.message || data.error || `Request failed with status ${res.status}`);
+  }
+
   return data;
 };
 

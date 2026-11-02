@@ -6,19 +6,49 @@
  */
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-const DATA_DIR = path.join(__dirname, '..', '..', 'data');
+// Detect serverless environment (Vercel, AWS Lambda)
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+
+// In serverless, write to /tmp; locally, write to project data directory
+const DATA_DIR = isServerless
+  ? path.join(os.tmpdir(), 'fraudshield_data')
+  : path.join(__dirname, '..', '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'embedded_db.json');
 
-// Ensure directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Safely ensure directory exists without throwing in read-only environments
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn('[EmbeddedStore] Notice: Persistent disk folder unavailable, operating in in-memory mode:', err.message);
 }
 
 class EmbeddedStore {
   constructor() {
     this.collections = {
-      users: [],
+      users: [
+        {
+          _id: 'user_admin_default',
+          name: 'System Administrator',
+          email: 'admin@fraudshield.local',
+          passwordHash: '$2a$10$7R44nQ3V4i0vYjUaE/5LueC27/oKovfX59lE01mF8N/W41BsyuYKG',
+          role: 'admin',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        },
+        {
+          _id: 'user_analyst_default',
+          name: 'Fraud Analyst Demo',
+          email: 'analyst@fraudshield.local',
+          passwordHash: '$2a$10$7R44nQ3V4i0vYjUaE/5LueC27/oKovfX59lE01mF8N/W41BsyuYKG',
+          role: 'analyst',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        }
+      ],
       customers: [],
       transactions: [],
       alerts: [],
@@ -53,7 +83,9 @@ class EmbeddedStore {
 
   saveToDisk() {
     try {
-      fs.writeFileSync(DB_FILE, JSON.stringify(this.collections, null, 2), 'utf-8');
+      if (fs.existsSync(DATA_DIR)) {
+        fs.writeFileSync(DB_FILE, JSON.stringify(this.collections, null, 2), 'utf-8');
+      }
     } catch (err) {
       console.warn('[EmbeddedStore] Warning saving database cache:', err.message);
     }

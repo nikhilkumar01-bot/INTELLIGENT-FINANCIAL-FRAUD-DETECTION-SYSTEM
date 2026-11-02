@@ -61,10 +61,13 @@ app.use('/api/auth/register', authLimiter);
 app.use('/api', apiRoutes);
 
 // Health Check
-app.get('/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
+  const { getDBStatus } = require('./config/db');
+  res.setHeader('Content-Type', 'application/json');
   res.json({
     status: 'healthy',
     system: 'Intelligent Financial Fraud Detection API',
+    database: getDBStatus(),
     timestamp: new Date().toISOString()
   });
 });
