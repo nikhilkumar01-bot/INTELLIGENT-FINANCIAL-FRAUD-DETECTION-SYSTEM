@@ -31,20 +31,29 @@ class EmbeddedStore {
     this.collections = {
       users: [
         {
-          _id: 'user_admin_default',
-          name: 'System Administrator',
+          _id: 'usr_admin_001',
+          name: 'Chief Risk Officer (Admin)',
           email: 'admin@fraudshield.local',
-          passwordHash: '$2a$10$7R44nQ3V4i0vYjUaE/5LueC27/oKovfX59lE01mF8N/W41BsyuYKG',
+          passwordHash: '$2a$10$AuI/gSJ7m9YNmq5H/axu2uX4nv9MeIA9wSaWbyx6BQxVRHdjMLpnm',
           role: 'admin',
           status: 'active',
           createdAt: new Date().toISOString()
         },
         {
-          _id: 'user_analyst_default',
-          name: 'Fraud Analyst Demo',
+          _id: 'usr_analyst_001',
+          name: 'Senior Fraud Analyst',
           email: 'analyst@fraudshield.local',
-          passwordHash: '$2a$10$7R44nQ3V4i0vYjUaE/5LueC27/oKovfX59lE01mF8N/W41BsyuYKG',
+          passwordHash: '$2a$10$nlHhk5rBboBK2RbXeb/E9.1xa0zj/WXLG5dvBwStarmUmS4ftqOBu',
           role: 'analyst',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        },
+        {
+          _id: 'usr_nikhil_001',
+          name: 'Nikhil Kumar',
+          email: 'nikhilkumariniyash@gmail.com',
+          passwordHash: '$2a$10$AuI/gSJ7m9YNmq5H/axu2uX4nv9MeIA9wSaWbyx6BQxVRHdjMLpnm',
+          role: 'admin',
           status: 'active',
           createdAt: new Date().toISOString()
         }
@@ -75,6 +84,16 @@ class EmbeddedStore {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
         this.collections = { ...this.collections, ...parsed };
+        return;
+      }
+
+      // In serverless cold starts, populate from bundled JSON database
+      const bundledSeed = path.join(__dirname, '..', '..', 'data', 'embedded_db.json');
+      if (fs.existsSync(bundledSeed)) {
+        const raw = fs.readFileSync(bundledSeed, 'utf-8');
+        const parsed = JSON.parse(raw);
+        this.collections = { ...this.collections, ...parsed };
+        this.saveToDisk();
       }
     } catch (err) {
       console.warn('[EmbeddedStore] Warning loading database cache:', err.message);
