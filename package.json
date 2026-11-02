@@ -1,0 +1,49 @@
+{
+  "name": "intelligent-financial-fraud-detection-system",
+  "version": "1.0.0",
+  "description": "AI/ML-Powered Financial Fraud Detection System with Real-Time Risk Scoring, Anomaly Detection & Analyst Investigation Platform",
+  "private": true,
+  "scripts": {
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../ml-service && uv venv && uv pip install -r requirements.txt",
+    "seed": "cd backend && node scripts/seed.js",
+    "train:ml": "cd ml-service && uv run python training/train_models.py",
+    "start:backend": "cd backend && npm run start",
+    "dev:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:ml": "cd ml-service && uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "dev": "concurrently --kill-others-on-fail -n \"BACKEND,FRONTEND,ML\" -c \"blue,green,magenta\" \"npm run dev:backend\" \"npm run start:frontend\" \"npm run start:ml\"",
+    "build": "cd frontend && npm run build",
+    "test": "cd backend && npm test",
+    "vercel-build": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "fraud-detection",
+    "machine-learning",
+    "random-forest",
+    "isolation-forest",
+    "react",
+    "express",
+    "fastapi",
+    "fintech"
+  ],
+  "author": "Nikhil Mathew",
+  "license": "MIT"
+}

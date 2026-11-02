@@ -1,0 +1,81 @@
+{
+  "model_name": "RandomForest_IsolationForest_Ensemble",
+  "model_version": "v1.2.0",
+  "training_samples": 4500,
+  "test_samples": 1500,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "roc_auc": 1.0,
+  "confusion_matrix": {
+    "true_negatives": 1384,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "true_positives": 116
+  },
+  "false_positive_rate": 0.0,
+  "false_negative_rate": 0.0,
+  "feature_importances": [
+    {
+      "feature": "tx_velocity_1h",
+      "importance": 0.346
+    },
+    {
+      "feature": "is_new_device",
+      "importance": 0.2293
+    },
+    {
+      "feature": "is_new_location",
+      "importance": 0.1101
+    },
+    {
+      "feature": "days_since_last_tx",
+      "importance": 0.1087
+    },
+    {
+      "feature": "amount_to_avg_ratio",
+      "importance": 0.101
+    },
+    {
+      "feature": "tx_hour",
+      "importance": 0.0395
+    },
+    {
+      "feature": "amount",
+      "importance": 0.0258
+    },
+    {
+      "feature": "is_night_tx",
+      "importance": 0.0199
+    },
+    {
+      "feature": "channel_WIRE_TRANSFER",
+      "importance": 0.0051
+    },
+    {
+      "feature": "historical_fraud_count",
+      "importance": 0.0046
+    }
+  ],
+  "all_features": [
+    "amount",
+    "customer_avg_amount",
+    "amount_to_avg_ratio",
+    "tx_hour",
+    "is_night_tx",
+    "tx_velocity_1h",
+    "is_new_device",
+    "is_new_location",
+    "historical_fraud_count",
+    "days_since_last_tx",
+    "channel_ATM",
+    "channel_CARD",
+    "channel_ONLINE",
+    "channel_UPI",
+    "channel_WIRE_TRANSFER",
+    "customer_risk_profile_HIGH",
+    "customer_risk_profile_LOW",
+    "customer_risk_profile_MEDIUM"
+  ]
+}

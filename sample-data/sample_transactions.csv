@@ -1,0 +1,9 @@
+transactionId,customerId,amount,channel,customerAvgAmount,txHour,txVelocity1h,isNewDevice,isNewLocation,merchant,finalStatus,riskCategory
+TX-10001,CUST-1001,35.50,CARD,45.00,14,1,0,0,Target Store #104,Genuine,LOW
+TX-10002,CUST-1005,16200.00,WIRE_TRANSFER,180.00,2,4,1,1,CryptoEx QuickTrade Inc,Confirmed Fraud,CRITICAL
+TX-10003,CUST-1008,125.00,ONLINE,110.00,16,1,0,0,Amazon Retail,Genuine,LOW
+TX-10004,CUST-1012,4.50,ONLINE,60.00,21,11,1,0,Digital Micro Merchant,Confirmed Fraud,HIGH
+TX-10005,CUST-1015,3400.00,CARD,3200.00,12,1,0,0,Delta Air Lines,Genuine,LOW
+TX-10006,CUST-1020,9500.00,ATM,750.00,3,3,1,1,ATM Cash Out Terminal,Confirmed Fraud,CRITICAL
+TX-10007,CUST-1025,85.00,UPI,70.00,18,1,0,0,Shell Gas Station,Genuine,LOW
+TX-10008,CUST-1030,1200.00,WIRE_TRANSFER,350.00,10,2,0,1,European Wholesale Ltd,Pending Review,MEDIUM

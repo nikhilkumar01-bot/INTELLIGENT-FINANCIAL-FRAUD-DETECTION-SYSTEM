@@ -1,0 +1,8 @@
+transactionId,customerId,amount,channel,customerAvgAmount,txHour,txVelocity1h,isNewDevice,isNewLocation,merchant,notes
+TX-IMP-8801,CUST-1002,45.20,CARD,45.00,14,1,0,0,Starbucks Coffee,Routine afternoon coffee
+TX-IMP-8802,CUST-1005,12500.00,WIRE_TRANSFER,180.00,3,4,1,1,Offshore Crypto Hub,Suspicious midnight wire transfer
+TX-IMP-8803,CUST-1012,320.00,ONLINE,300.00,16,1,0,0,Amazon Marketplace,Normal consumer purchase
+TX-IMP-8804,CUST-1025,8500.00,ATM,750.00,2,3,1,1,ATM Cash Out Terminal,High value midnight cash withdrawal
+TX-IMP-8805,CUST-1033,2.50,ONLINE,150.00,19,9,1,0,Micro Digital Services,Card testing velocity burst attack
+TX-IMP-8806,CUST-1040,1200.00,CARD,1100.00,11,1,0,0,Marriott Hotel Booking,Legitimate high value hotel booking
+TX-IMP-8807,CUST-1048,6500.00,WIRE_TRANSFER,500.00,1,5,1,1,Unknown Remittance Ltd,High risk international wire

@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0B0F19;
+    color: #F8FAFC;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F293D;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Glowing border effect */
+.fintech-glow {
+  box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.15);
+}
+.fintech-danger-glow {
+  box-shadow: 0 0 25px -5px rgba(239, 68, 68, 0.2);
+}
+.fintech-card {
+  background: #111827;
+  border: 1px solid #1F293D;
+  border-radius: 0.75rem;
+}
